@@ -24,13 +24,18 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Node dependencies
-        run: npm install --force
+      - name: Install dependencies cleanly
+        run: npm install --legacy-peer-deps
 
-      - name: Sync Capacitor Android
+      - name: Ensure web assets exist
         run: |
           mkdir -p www
-          npx cap sync android || true
+          if [ ! -f www/index.html ]; then
+            echo '<!DOCTYPE html><html><head><title>Block Jewel 3D</title></head><body></body></html>' > www/index.html
+          fi
+
+      - name: Sync Capacitor
+        run: npx cap sync android
 
       - name: Build APK with Gradle
         run: |
