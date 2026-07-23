@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Auto-Fix NPM & Package
+      - name: Install Dependencies
         run: |
           if [ ! -f package.json ]; then
             npm init -y
@@ -33,17 +33,23 @@ jobs:
             npm install --legacy-peer-deps --force
           fi
 
-      - name: Auto-Fix Web & Capacitor
+      - name: Prepare Capacitor & Fix Cordova Error
         run: |
           mkdir -p www
           if [ ! -f www/index.html ]; then
             echo '<!DOCTYPE html><html><head><title>Block Jewel 3D</title></head><body><h1>Block Jewel 3D</h1></body></html>' > www/index.html
           fi
-          if [ ! -d "android" ] || [ ! -f "android/gradlew" ]; then
-            npx cap add android || true
+          
+          if [ ! -d "android" ]; then
+            npx cap add android
           else
-            npx cap sync android || true
+            npx cap sync android
           fi
+          
+          # ĐÂY LÀ ĐOẠN SỬA LỖI: Tự động tạo file cordova.variables bị thiếu
+          mkdir -p android/capacitor-cordova-android-plugins
+          touch android/capacitor-cordova-android-plugins/cordova.variables.gradle
+          touch android/capacitor-cordova-android-plugins/build.gradle
 
       - name: Build APK with Gradle
         run: |
