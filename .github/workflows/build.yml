@@ -19,10 +19,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Dependencies
         run: |
@@ -46,7 +46,7 @@ jobs:
             npx cap sync android
           fi
           
-          # ĐÂY LÀ ĐOẠN SỬA LỖI: Tự động tạo file cordova.variables bị thiếu
+          # Tự động tạo file cordova.variables bị thiếu
           mkdir -p android/capacitor-cordova-android-plugins
           touch android/capacitor-cordova-android-plugins/cordova.variables.gradle
           touch android/capacitor-cordova-android-plugins/build.gradle
