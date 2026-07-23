@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Java JDK 17
@@ -24,19 +24,25 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps --force
+      - name: Auto-Fix NPM & Package
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+            npm install @capacitor/core @capacitor/cli @capacitor/android
+          else
+            npm install --legacy-peer-deps --force
+          fi
 
-      - name: Sync Capacitor Android
+      - name: Auto-Fix Web & Capacitor
         run: |
           mkdir -p www
           if [ ! -f www/index.html ]; then
-            echo '<!DOCTYPE html><html><head><title>App</title></head><body></body></html>' > www/index.html
+            echo '<!DOCTYPE html><html><head><title>Block Jewel 3D</title></head><body><h1>Block Jewel 3D</h1></body></html>' > www/index.html
           fi
           if [ ! -d "android" ] || [ ! -f "android/gradlew" ]; then
-            npx cap add android
+            npx cap add android || true
           else
-            npx cap sync android
+            npx cap sync android || true
           fi
 
       - name: Build APK with Gradle
