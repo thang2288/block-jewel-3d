@@ -10,34 +10,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps --force
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+      - name: Sync Capacitor Android
+        run: |
+          mkdir -p www
+          if [ ! -f www/index.html ]; then
+            echo '<!DOCTYPE html><html><head><title>App</title></head><body></body></html>' > www/index.html
+          fi
+          if [ ! -d "android" ] || [ ! -f "android/gradlew" ]; then
+            npx cap add android
+          else
+            npx cap sync android
+          fi
 
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
